@@ -12,8 +12,7 @@ const config: Config = {
       'blue': '#4092df'
     },
     fontFamily: {
-      sans: ['Graphik', 'sans-serif'],
-      serif: ['Merriweather', 'serif'],
+      roboto: ['Roboto', 'sans-serif'],
     },
     extend: {
       backgroundImage: {
