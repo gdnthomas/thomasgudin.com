@@ -5,10 +5,10 @@ export interface ISlogan {
 }
 
 const Slogan: React.FC<ISlogan> = ({ qualifications }) => {
-
-  return (
-  <div className={styles.container}>{qualifications}</div>
-  );
+  const listItems = qualifications.map((qualif) => (
+    <div key={qualif}>{qualif}</div>
+  ));
+  return <div className={styles.container}>{listItems}</div>;
 };
 
 export default Slogan;
