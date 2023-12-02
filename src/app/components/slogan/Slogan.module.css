@@ -1,3 +1,17 @@
-.container {
-    color: red;
+.top {
+    font-size: 40px;
+    line-height: 50px;
+    color: #FFF;
+}
+.name{
+    font-size: 70px;
+    font-weight: 300;
+    line-height: 60px;
+    color: #FFF;
+}
+.metier{
+    font-size: 120px;
+    font-weight: 800;
+    line-height: 110px;
+    color: #FFF;
 }

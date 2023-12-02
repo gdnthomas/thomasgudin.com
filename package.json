@@ -13,7 +13,8 @@
   "dependencies": {
     "next": "14.0.3",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-social-icons": "^6.7.0"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^7.5.3",
