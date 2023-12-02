@@ -9,32 +9,30 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
+    env:
+      SERVER_SSH_ADRESS: ${{ secrets.SERVER_SSH_ADRESS }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Install SSH key
-      uses: webfactory/ssh-agent@v0.8.0
-      with:
-        ssh-private-key: ${{ secrets.PROD_SSH_PRIVATE }}
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.PROD_SSH_PRIVATE }}
 
-    - name: Deploy code to server
-      env:
-        SERVER_SSH_ADRESS: ${{ secrets.SERVER_SSH_ADRESS }}
-      run: |
-        ssh $SERVER_SSH_ADRESS << EOF
-          cd /srv/thomasgudin.com
-          git pull 
-        EOF
-      
+      - name: Deploy code to server
 
-    - name: SSH into server and restart Docker container
-      env:
-        SERVER_SSH_ADRESS: ${{ secrets.SERVER_SSH_ADRESS }}
-      run: |
-        ssh $SERVER_SSH_ADRESS << EOF
-          cd /srv/thomasgudin.com
-          docker stop thomasgudin.com.prod
-          docker system prune -f
-          docker-compose up -d
-        EOF
+        run: |
+          ssh $SERVER_SSH_ADRESS << EOF
+            cd /srv/thomasgudin.com
+            git pull 
+          EOF
+
+      - name: SSH into server and restart Docker container
+        run: |
+          ssh $SERVER_SSH_ADRESS << EOF
+            cd /srv/thomasgudin.com
+            docker stop thomasgudin.com.prod
+            docker system prune -f
+            docker-compose up -d
+          EOF
