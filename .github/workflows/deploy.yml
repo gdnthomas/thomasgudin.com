@@ -19,15 +19,20 @@ jobs:
         ssh-private-key: ${{ secrets.PROD_SSH_PRIVATE }}
 
     - name: Deploy code to server
+      env:
+        SERVER_SSH_ADRESS: ${{ secrets.SERVER_SSH_ADRESS }}
       run: |
-        ssh ${{ secrets.SERVER_SSH_ADRESS }} << EOF
+        ssh env.SERVER_SSH_ADRESS << EOF
           cd /srv/thomasgudin.com
           git pull 
         EOF
+      
 
     - name: SSH into server and restart Docker container
+      env:
+        SERVER_SSH_ADRESS: ${{ secrets.SERVER_SSH_ADRESS }}
       run: |
-        ssh ${{ secrets.SERVER_SSH_ADRESS }} << EOF
+        ssh env.SERVER_SSH_ADRESS << EOF
           cd /srv/thomasgudin.com
           docker stop thomasgudin.com.prod
           docker system prune -f
