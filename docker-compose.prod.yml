@@ -13,7 +13,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
-      - "traefik.http.routers.thomasgudin.entrypoints=web,websecure"
+      - "traefik.http.routers.thomasgudin.entrypoints=web"
       - "traefik.http.routers.thomasgudin.rule=Host(`thomasgudin.com`)"
       - "traefik.http.services.thomasgudin.loadbalancer.server.port=3000"
       - "traefik.port=80"
