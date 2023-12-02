@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     env:
-      Server: ${{ secrets.SERVER_SSH_ADRESS }}
+      SERVER_SSH_ADRESS: ${{ secrets.SERVER_SSH_ADRESS }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -24,14 +24,14 @@ jobs:
         run: printenv 
 
       - name: Deploy code to server
-        run: ssh $Server << EOF
+        run: ssh "$SERVER_SSH_ADRESS" << EOF
           cd /srv/thomasgudin.com
           git pull
           EOF
 
       - name: SSH into server and restart Docker container
         run: |
-          ssh $Server << EOF
+          ssh "$SERVER_SSH_ADRESS" << EOF
             cd /srv/thomasgudin.com
             docker stop thomasgudin.com.prod
             docker system prune -f
