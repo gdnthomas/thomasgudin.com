@@ -13,9 +13,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
-      - "traefik.http.routers.your_router.entrypoints=web,websecure"
-      - "traefik.http.routers.your_router.rule=Host(`thomasgudin.com`)"
-      - "traefik.http.services.your_router.loadbalancer.server.port=3000"
+      - "traefik.http.routers.thomasgudin.entrypoints=web,websecure"
+      - "traefik.http.routers.thomasgudin.rule=Host(`thomasgudin.com`)"
+      - "traefik.http.services.thomasgudin.loadbalancer.server.port=3000"
       - "traefik.port=80"
   traefik:
     image: "traefik:v2.10"
