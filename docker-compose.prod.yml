@@ -1,0 +1,39 @@
+version: "3.8"
+services: 
+  thomasgudin:
+    container_name: thomasgudin.com.prod
+    build: .
+    restart: always
+    environment:
+      - NODE_ENV=production
+    ports:
+      - 3000:3000
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.your_router.entrypoints=web,websecure"
+      - "traefik.http.routers.your_router.rule=Host(`thomasgudin.com`)"
+      - "traefik.http.services.your_router.loadbalancer.server.port=3000"
+      - "traefik.port=80"
+  traefik:
+    image: "traefik:v2.10"
+    container_name: "traefik"
+    networks:
+      - web
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+networks:
+    web:
+        external:
+            name: web
