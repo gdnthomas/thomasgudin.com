@@ -1,0 +1,35 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install SSH key
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.PROD_SSH_PRIVATE }}
+
+    - name: Deploy code to server
+      run: |
+        ssh ubuntu@146.59.204.55 << EOF
+          cd /srv/thomasgudin.com
+          git pull 
+        EOF
+
+    - name: SSH into server and restart Docker container
+      run: |
+        ssh ubuntu@146.59.204.55 << EOF
+          cd /srv/thomasgudin.com
+          docker stop thomasgudin.com.prod
+          docker system prune -f
+          docker-compose up -d
+        EOF
