@@ -22,15 +22,14 @@ jobs:
 
       - name: Deploy code to server
 
-        run: |
-          ssh $SERVER_SSH_ADRESS << EOF
+        run: ssh env.SERVER_SSH_ADRESS << EOF
             cd /srv/thomasgudin.com
             git pull 
           EOF
 
       - name: SSH into server and restart Docker container
         run: |
-          ssh $SERVER_SSH_ADRESS << EOF
+          ssh env.SERVER_SSH_ADRESS << EOF
             cd /srv/thomasgudin.com
             docker stop thomasgudin.com.prod
             docker system prune -f
