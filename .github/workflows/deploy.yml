@@ -22,7 +22,7 @@ jobs:
       env:
         SERVER_SSH_ADRESS: ${{ secrets.SERVER_SSH_ADRESS }}
       run: |
-        ssh env.SERVER_SSH_ADRESS << EOF
+        ssh $SERVER_SSH_ADRESS << EOF
           cd /srv/thomasgudin.com
           git pull 
         EOF
@@ -32,7 +32,7 @@ jobs:
       env:
         SERVER_SSH_ADRESS: ${{ secrets.SERVER_SSH_ADRESS }}
       run: |
-        ssh env.SERVER_SSH_ADRESS << EOF
+        ssh $SERVER_SSH_ADRESS << EOF
           cd /srv/thomasgudin.com
           docker stop thomasgudin.com.prod
           docker system prune -f
