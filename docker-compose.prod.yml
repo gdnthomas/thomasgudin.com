@@ -14,7 +14,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
       - "traefik.http.routers.thomasgudin.entrypoints=web"
-      - "traefik.http.routers.thomasgudin.rule=Host(`thomasgudin.com`)"
+      - "traefik.http.routers.thomasgudin.rule=Host(`thomasgudin.com`,`www.thomasgudin.com`)"
       - "traefik.http.services.thomasgudin.loadbalancer.server.port=3000"
       - "traefik.port=80"
   traefik:
@@ -23,7 +23,7 @@ services:
     networks:
       - web
     command:
-      #- "--log.level=DEBUG"
+      - "--log.level=DEBUG"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
