@@ -11,7 +11,8 @@ export interface ISlogan {
 const Slogan: React.FC<ISlogan> = ({ qualifications, name, baseline }) => {
   const [currentQualification, setCurrentQualification] = useState<
     string | null
-  >(null);
+  >(qualifications[0]);
+
 
   useEffect(() => {
     // Utiliser un effet pour mettre à jour le texte de qualification à chaque rendu
