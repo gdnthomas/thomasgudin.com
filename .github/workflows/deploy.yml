@@ -21,7 +21,7 @@ jobs:
           ssh-private-key: ${{ secrets.PROD_SSH_PRIVATE }}
 
       - name: test
-        run: ssh "$SERVER_SSH_ADRESS" && ll EOF
+        run: ssh 146.59.204.55 && ll EOF
   
       - name: Deploy code to server
         run: |
