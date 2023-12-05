@@ -21,9 +21,10 @@ jobs:
           ssh-private-key: ${{ secrets.PROD_SSH_PRIVATE }}
 
       - name: Deploy code to server
-        run: ssh "$SERVER_SSH_ADRESS"<<"EOF"
-          cd /srv/thomasgudin.com
-          git pull
+        run: |
+          ssh "$SERVER_SSH_ADRESS"<<"EOF"
+            cd /srv/thomasgudin.com
+            git pull
           EOF
 
       - name: SSH into server and restart Docker container
