@@ -20,6 +20,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.PROD_SSH_PRIVATE }}
 
+      - name: test
+        run: ssh "$SERVER_SSH_ADRESS" && ll EOF
+  
       - name: Deploy code to server
         run: |
           ssh "$SERVER_SSH_ADRESS"<<"EOF"
