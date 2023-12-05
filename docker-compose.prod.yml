@@ -16,7 +16,7 @@ services:
       - "traefik.http.routers.thomasgudin.entrypoints=web"
       - "traefik.http.routers.thomasgudin.rule=Host(`thomasgudin.com`,`www.thomasgudin.com`)"
       - "traefik.http.services.thomasgudin.loadbalancer.server.port=3000"
-      - "traefik.port=80"
+      - "traefik.http.routers.thomasgudin.tls.certresolver=thomasgudintls"
   traefik:
     image: "traefik:v2.10"
     container_name: "traefik"
@@ -28,10 +28,17 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.thomasgudintls.acme.tlschallenge=true"
+      - "--certificatesresolvers.thomasgudintls.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.thomasgudintls.acme.email=gudinthomas@gmail.com"
+      - "--certificatesresolvers.thomasgudintls.acme.storage=/letsencrypt/acme.json"     
     ports:
       - "80:80"
       - "8080:8080"
+      - "443:443"
     volumes:
+      - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 networks:
   web:
