@@ -9,7 +9,7 @@ services:
     ports:
       - 3000:3000
     networks:
-      - web
+      - thomasgudin
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
@@ -21,7 +21,7 @@ services:
     image: "traefik:v2.10"
     container_name: "traefik"
     networks:
-      - web
+      - thomasgudin
     command:
       #- "--log.level=DEBUG"
       - "--api.insecure=true"
@@ -39,5 +39,7 @@ services:
     volumes:
       - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-  web:
+networks:
+  thomasgudin:
+    name: web
     external: true
