@@ -1,5 +1,5 @@
 version: "3.8"
-services: 
+services:
   thomasgudin:
     container_name: thomasgudin.com.prod
     build: .
@@ -31,7 +31,7 @@ services:
       - "--certificatesresolvers.thomasgudintls.acme.tlschallenge=true"
       #- "--certificatesresolvers.thomasgudintls.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.thomasgudintls.acme.email=gudinthomas@gmail.com"
-      - "--certificatesresolvers.thomasgudintls.acme.storage=/letsencrypt/acme.json"     
+      - "--certificatesresolvers.thomasgudintls.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
       - "8080:8080"
@@ -39,6 +39,5 @@ services:
     volumes:
       - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-networks:
   web:
-            
+    external: true
