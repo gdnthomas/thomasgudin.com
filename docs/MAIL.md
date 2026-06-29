@@ -27,33 +27,115 @@ Petit serveur mail basé sur [docker-mailserver](https://docker-mailserver.githu
 
 ## 1. Enregistrements DNS
 
-À créer dans la zone DNS de `thomasgudin.com` (OVH Manager → *Domaines* → *Zone DNS*).
+À configurer dans **OVH Manager → Web Cloud → Domaines → `thomasgudin.com` → Zone DNS**.
 IP du serveur : **146.59.204.55**
 
-| Type  | Nom                     | Valeur / Cible                         | Remarque                          |
-| ----- | ----------------------- | -------------------------------------- | --------------------------------- |
-| A     | `mail`                  | `146.59.204.55`                        | hôte du serveur mail              |
-| MX    | `@` (racine)            | `mail.thomasgudin.com.` priorité `10`  | **supprimer les MX OVH existants**|
-| TXT   | `@` (racine)            | `v=spf1 a:mail.thomasgudin.com -all`   | SPF (remplace `v=spf1 -all`)      |
-| TXT   | `_dmarc`                | `v=DMARC1; p=quarantine; rua=mailto:postmaster@thomasgudin.com; adkim=s; aspf=s` | DMARC |
+État actuel de la zone (vérifié) : `A thomasgudin.com` existe déjà ; il n'y a **aucun MX**,
+**aucun SPF**, **aucun DMARC**, **aucun DKIM**. Il n'y a donc rien à supprimer, uniquement
+des ajouts. Le TXT existant `1|www.thomasgudin.com` est un marqueur OVH : **ne pas y toucher**.
 
-> La ligne **DKIM** (`mail._domainkey`) est générée à l'étape 5, après le premier démarrage.
+Récapitulatif :
+
+| # | Type | Sous-domaine    | Priorité | Cible / Valeur                                   |
+|---|------|-----------------|----------|--------------------------------------------------|
+| 1 | A    | `mail`          | —        | `146.59.204.55`                                  |
+| 2 | MX   | *(vide)*        | `10`     | `mail.thomasgudin.com.`                          |
+| 3 | TXT  | *(vide)*        | —        | `v=spf1 a:mail.thomasgudin.com ~all`             |
+| 4 | TXT  | `_dmarc`        | —        | `v=DMARC1; p=none; rua=mailto:postmaster@thomasgudin.com; adkim=s; aspf=s` |
+| 5 | TXT  | `mail._domainkey` | —      | *(généré à l'étape 5 — DKIM)*                    |
+
+### Détail champ par champ (formulaire OVH « Ajouter une entrée »)
+
+**1. A — hôte du serveur mail**
+- Type : `A`
+- Sous-domaine : `mail`
+- TTL : *Par défaut*
+- Cible : `146.59.204.55`
+- → donne `mail.thomasgudin.com → 146.59.204.55`
+
+**2. MX — où arrive le courrier du domaine**
+- Type : `MX`
+- Sous-domaine : *(laisser vide = la racine `thomasgudin.com`)*
+- TTL : *Par défaut*
+- Priorité : `10`
+- Cible : `mail.thomasgudin.com.` *(le point final est important ; OVH l'ajoute en général tout seul)*
+- → tout mail vers `…@thomasgudin.com` est livré à `mail.thomasgudin.com`
+
+> ⚠️ La cible d'un MX doit être un **nom d'hôte** (jamais une IP) et ce nom doit avoir
+> un enregistrement A (c'est l'entrée n°1). Ne mets donc pas `146.59.204.55` ici.
+
+**3. TXT — SPF (qui a le droit d'envoyer pour le domaine)**
+- Type : `TXT`
+- Sous-domaine : *(laisser vide = la racine)*
+- TTL : *Par défaut*
+- Valeur : `v=spf1 a:mail.thomasgudin.com ~all`
+- `a:mail.thomasgudin.com` = l'IP du A de `mail` est autorisée à envoyer.
+- `~all` (softfail) le temps des tests ; passe à `-all` (strict) une fois la délivrabilité validée.
+- → il ne doit exister **qu'un seul** enregistrement TXT commençant par `v=spf1`.
+  Le TXT `1|www.thomasgudin.com` n'est pas un SPF : il peut coexister sans problème.
+
+**4. TXT — DMARC (politique en cas d'échec SPF/DKIM)**
+- Type : `TXT`
+- Sous-domaine : `_dmarc`
+- TTL : *Par défaut*
+- Valeur : `v=DMARC1; p=none; rua=mailto:postmaster@thomasgudin.com; adkim=s; aspf=s`
+- `p=none` = mode observation au début (tu reçois les rapports sans rien bloquer).
+  Une fois SPF + DKIM OK, durcis en `p=quarantine` puis `p=reject`.
+
+**5. TXT — DKIM** : voir l'étape 5 (généré par le serveur après le 1er démarrage,
+sélecteur `mail`, donc sous-domaine `mail._domainkey`).
 
 ---
 
-## 2. Reverse DNS (PTR) — indispensable pour l'envoi
+## 2. Reverse DNS (PTR) — indispensable pour l'envoi (cas Public Cloud)
 
 Le PTR actuel de l'IP est `d2-2-gra7...` (défaut OVH). Sans PTR cohérent, Gmail/Outlook
 rejettent ou classent en spam les mails sortants.
 
-Dans **OVH Manager → Bare Metal / VPS / Public Cloud → ton serveur → Réseau / IP → "Reverse DNS"** :
+> **Prérequis bloquant** : l'entrée **A `mail.thomasgudin.com → 146.59.204.55`** (étape 1)
+> doit déjà être créée **et propagée**. Au moment où tu valides le reverse, OVH vérifie
+> en direct que le A pointe bien vers cette IP (cohérence FCrDNS), sinon il refuse.
+
+### Via le panneau OVHcloud (recommandé)
+
+1. [OVHcloud Control Panel](https://www.ovh.com/manager/) → section **Network** (« Réseau »).
+2. Clique sur **Public IP Addresses** (« Adresses IP publiques »).
+3. Recherche `146.59.204.55` (barre de recherche / filtre par catégorie).
+4. Sur la ligne de l'IP, clique le bouton **⁝** → **Configure the reverse DNS**
+   (ou l'icône **crayon** dans la colonne *Reverse DNS*).
+5. Saisis le reverse **avec le point final** :
+   ```
+   mail.thomasgudin.com.
+   ```
+6. **Confirm**. (La propagation peut prendre jusqu'à 24 h.)
+
+### Via l'API OVHcloud (alternative)
+
+Sur [api.ovh.com](https://api.ovh.com/console/) → `POST /ip/{ip}/reverse` :
 
 ```
-146.59.204.55  ->  mail.thomasgudin.com
+ip       = 146.59.204.55
+ipReverse= 146.59.204.55
+reverse  = mail.thomasgudin.com.
+```
+
+Vérification : `GET /ip/146.59.204.55/reverse/146.59.204.55`.
+
+### ⚠️ Stabilité de l'IP en Public Cloud
+
+Une IP publique d'instance Public Cloud reste attachée **tant que l'instance existe**
+(un simple reboot/stop-start la conserve), mais elle est **perdue si tu supprimes/recrées
+l'instance** — il faudrait alors refaire le A **et** le reverse.
+
+Pour une IP indépendante de l'instance, utilise une **Floating IP** : son reverse se règle
+soit dans *Network → Public IP Addresses* (idem ci-dessus), soit en CLI OpenStack :
+
+```bash
+openstack floating ip set --dns-domain mail.thomasgudin.com. <FLOATING_IP_ID>
 ```
 
 Le PTR doit correspondre exactement au `hostname` du conteneur (`mail.thomasgudin.com`)
-et l'enregistrement A de cet hôte doit pointer vers la même IP (cohérence FCrDNS).
+et le A de cet hôte doit pointer vers la même IP.
 
 ---
 
