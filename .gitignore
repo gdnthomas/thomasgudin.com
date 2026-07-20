@@ -35,7 +35,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# serveur mail (données des boîtes, état, logs, clés DKIM)
-/docker-data/
 # certificats Let's Encrypt gérés par Traefik
 /letsencrypt/
