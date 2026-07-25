@@ -14,18 +14,17 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
       - "traefik.http.routers.thomasgudin.entrypoints=websecure"
-      - "traefik.http.routers.thomasgudin.rule=Host(`thomasgudin.com`,`www.thomasgudin.com`)"
+      - "traefik.http.routers.thomasgudin.rule=Host(`thomasgudin.com`) || Host(`www.thomasgudin.com`)"
       - "traefik.http.services.thomasgudin.loadbalancer.server.port=3000"
       - "traefik.http.routers.thomasgudin.tls.certresolver=thomasgudintls"
   traefik:
-    image: "traefik:v2.10"
+    image: "traefik:v3.7.8"
     container_name: "traefik"
     networks:
       - thomasgudinperso
       - web
     command:
-      - "--log.level=DEBUG"
-      - "--api.insecure=true"
+      - "--log.level=INFO"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
@@ -36,7 +35,6 @@ services:
       - "--certificatesresolvers.thomasgudintls.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
-      - "8080:8080"
       - "443:443"
     volumes:
       - "./letsencrypt:/letsencrypt"
